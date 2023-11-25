@@ -299,6 +299,15 @@ function selectQuestions(questions, difficulty, count) {
   const selectedQuestions = questions.filter(
     (question) => question[3] === difficulty
   );
+
+  for (let i = selectedQuestions.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [selectedQuestions[i], selectedQuestions[j]] = [
+      selectedQuestions[j],
+      selectedQuestions[i],
+    ];
+  }
+
   return selectedQuestions.slice(0, count);
 }
 
@@ -356,18 +365,22 @@ document
 
 // downloading data button
 
-document
-  .getElementById("downloadButton")
-  .addEventListener("click", function () {
-    const fileData = "Sample file content.";
-    const blob = new Blob([fileData], { type: "text/plain" });
+async function downloadFileFromGitHub() {
+  const owner = "KhushiramMeena";
+  const repo = "Question-Paper";
+  const filePath = "data.json";
+
+  const downloadUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/${filePath}`;
+
+  try {
+    const response = await fetch(downloadUrl);
+    const blob = await response.blob();
 
     const downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.download = "data.json";
-
-    document.body.appendChild(downloadLink);
+    downloadLink.href = window.URL.createObjectURL(blob);
+    downloadLink.setAttribute("download", filePath.split("/").pop());
     downloadLink.click();
-
-    document.body.removeChild(downloadLink);
-  });
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
